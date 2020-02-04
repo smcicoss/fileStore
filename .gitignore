@@ -1,6 +1,7 @@
 .eric6project/
 .ropeproject/
 .directory/
+FileStore.e4p
 *.pyc
 *.pyo
 *.orig
