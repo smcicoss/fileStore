@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-5.1.dtd">
 <!-- eric project file for project FileStore -->
-<!-- Saved: 2020-02-03, 14:08:33 -->
+<!-- Saved: 2020-02-04, 11:37:44 -->
 <!-- Copyright (C) 2020 Simón Martínez, simon@cicoss.net -->
 <Project version="5.1">
   <Language></Language>
@@ -12,9 +12,6 @@
   <Author>Simón Martínez</Author>
   <Email>simon@cicoss.net</Email>
   <Eol index="0"/>
-  <Sources>
-    <Source>__init__.py</Source>
-  </Sources>
   <Others>
     <Other>.gitignore</Other>
   </Others>
