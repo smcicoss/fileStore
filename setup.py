@@ -28,7 +28,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="FileStore-smcicoss",      # Replace with your own username
+    name="FileStore-smcicoss",
     version="0.0.1",
     author="Simón Martínez",
     author_email="simon@cicoss.net",
@@ -37,6 +37,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/smcicoss/fileStore",
     packages=setuptools.find_packages(),
+    scripts=["prueba.py"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
