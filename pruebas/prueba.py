@@ -68,5 +68,5 @@ if __name__ == '__main__':
             print("El fichero no existe en el path registrado")
 
     enlaces = fileST.findStoreLinks(cnf.conf["storedDirs"][2])
-    print(enlaces[0].decode("utf-8"))
-    print(len(enlaces))
+    # print(cons.MSG_ALERT, enlaces[0].decode("utf-8"), cons.MSG_END)
+    print(cons.MSG_ALERT, len(enlaces), cons.MSG_END)

@@ -19,7 +19,9 @@ from libStore import configStore as cnf
 class bdStore(object):
 
     def __init__(self):
-        # Establece conexión con base de datos
+        # Establece conexión con el servidor de base de datos
+        # Prepara un cursor y obtiene la versión
+        # del gestor de BD
         self.__conect = pymysql.connect(
             cnf.conf["dbHost"], cnf.conf["dbUser"],
             cnf.conf["dbPasswd"], cnf.conf["baseDatos"])
@@ -37,6 +39,7 @@ class bdStore(object):
         self.__conect.close()
 
     def getFileId(self, chksum):
+        # Obtiene el id del fichero en la BD
         sql = "SELECT id FROM files WHERE sha256sum LIKE '{}'".format(chksum)
         self.cursor.execute(sql)
         id = self.cursor.fetchone()
@@ -46,28 +49,35 @@ class bdStore(object):
             return id[0]
 
     def getFileChk(self, id):
+        # Obtiene el nombre del fichero en la BD
         sql = "SELECT sha256sum FROM files WHERE id = {}".format(id)
         self.cursor.execute(sql)
         chk = self.cursor.fetchone()
         return chk[0]
 
     def getListFiles(self):
+        # obtiene la lista ordenada y completa de los ids de ficheros
         sql = "SELECT * FROM files ORDER BY id;"
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def getUrisOfFile(self, fileid):
+        # Obtiene la lista de todos los orígenes del fichero
         sql = "SELECT id FROM uris WHERE file_id = {}".format(fileid)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def getUri(self, uriId):
+        # Obtiene el path y el nombre de un origen
         sql = "SELECT path, filename FROM uris WHERE id = {}".format(uriId)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def insertFile(self, fileChk):
+        # Inserta un fichero en la BD
+        # TODO
         pass
 
 
 BaseDatos = bdStore()
+BDStore = BaseDatos

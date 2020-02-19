@@ -53,7 +53,7 @@ def scanStoreInDB():
             #         podría ser buscar enlace que apunte al fichero
             sys.exit(1)
         else:
-            print("\n{} - {}".format(fsid, fstored))
+            print("\n{} -> {}".format(fstored, fsid))
 
     print("\n\n---------------------------------\n\n")
 

@@ -22,7 +22,9 @@ from libStore import configStore as cnf
 
 
 class fst_stat():
+    # Mantiene los metadatos de un fichero
     def __init__(self, filename):
+        # Obtiene los valores
         if not path.isfile(filename):
             self.exists = False
             return
@@ -51,17 +53,23 @@ class fst_stat():
 
 
 def typeFile(mode):
+    # Obtiene el tipo de fichero
     if stat.S_ISREG(mode):
+        # Fichero regular
         return 'f'
     elif stat.S_ISLNK(mode):
+        # Enlace simbólico
         return 'l'
     elif stat.S_IFDIR(mode):
+        # Directorio
         return 'd'
     else:
+        # Otros
         return 'o'
 
 
 def findFile(raiz, nombre):
+    # Busca un nombre de fichero en un arbol de directorios
     if not path.isdir(raiz):
         return None
 
@@ -74,6 +82,7 @@ def findFile(raiz, nombre):
 
 
 def findDir(raiz, nombre):
+    # Busca un nombre de directorio dentro de un arbol
     if not path.isdir(raiz):
         return None
 
@@ -86,6 +95,7 @@ def findDir(raiz, nombre):
 
 
 def findLinkTo(raiz, nombre):
+    # Busca un enlace simbolico que apunte a nombre dentro de un árbol
     if not path.isdir(raiz):
         return None
 
@@ -98,11 +108,13 @@ def findLinkTo(raiz, nombre):
 
 
 def findStored(chksum):
+    # Busca un fichero dentro del store
     filestored = findFile(cnf.conf['storePath'], chksum)
     return filestored
 
 
 def findStoreLinks(origen):
+    # Busca los enlaces simbílicos que apuntan al store dentro de un árbol
     cmd = "find \"{}\" -type l -lname \"{}*\"".format(
         origen, cnf.conf["storePath"])
     links = [line[0:]
@@ -111,6 +123,7 @@ def findStoreLinks(origen):
 
 
 def listStored():
+    # Obtiene la lista de ficheros dentro del store
     cmd = "find -P '{}' -type f -iname \"*\" -not -iname \".*\"".format(
         cnf.conf['storePath'])
     paths = [line[0:]
@@ -119,6 +132,7 @@ def listStored():
 
 
 def hashFile(filename):
+    # Calcula el hash sha256 de un fichero
     if not path.isfile(filename):
         return None
 
@@ -128,6 +142,7 @@ def hashFile(filename):
 
 
 def getLinkTo(filename):
+    # Obtiene el destino de un enlace simbólico
     if not path.islink(filename):
         return None
     return readlink(filename)
