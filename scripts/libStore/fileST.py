@@ -12,23 +12,53 @@ en fileStore
 """
 
 from hashlib import sha256
-from os import lstat, path
+from os import lstat, path, readlink
+import stat
 import pwd
 import grp
 import subprocess
-# from libStore import constStore as cons
+import magic
 from libStore import configStore as cnf
-
-claves_st = ["st_mode", "st_dev", "st_nlink", "st_uid",
-             "st_gid", "st_size", "st_atime", "st_mtime", "st_ctime"]
 
 
 class fst_stat():
-    def __init__(self, result):
-        for clave in claves_st:
-            self[clave] = result[clave]
-        self.st_uname = pwd.getpwuid(result.st_uid).pw_name
-        self.st_gname = grp.getgrgid(result.st_gid).gr_name
+    def __init__(self, filename):
+        if not path.isfile(filename):
+            self.exists = False
+            return
+
+        fstat = lstat(filename)
+
+        self.userid = fstat.st_uid
+        self.uname = pwd.getpwuid(fstat.st_uid).pw_name
+        self.gid = fstat.st_gid
+        self.gname = grp.getgrgid(fstat.st_gid).gr_name
+        self.size = fstat.st_size
+        self.rights = fstat.st_mode
+        self.mode = stat.S_IMODE(self.rights)
+        self.type = typeFile(self.rights)
+        self.timeaccess = fstat.st_atime
+        self.timemod = fstat.st_mtime
+        self.timechang = fstat.st_ctime
+        self.timecreat = 0
+        mime = magic.Magic(mime=True)
+        self.mime = mime.from_file(filename)
+        self.chksum = hashFile(filename)
+        if self.chksum is None:
+            self.exists = False
+        else:
+            self.exists = True
+
+
+def typeFile(mode):
+    if stat.S_ISREG(mode):
+        return 'f'
+    elif stat.S_ISLNK(mode):
+        return 'l'
+    elif stat.S_IFDIR(mode):
+        return 'd'
+    else:
+        return 'o'
 
 
 def findFile(raiz, nombre):
@@ -72,6 +102,22 @@ def findStored(chksum):
     return filestored
 
 
+def findStoreLinks(origen):
+    cmd = "find \"{}\" -type l -lname \"{}*\"".format(
+        origen, cnf.conf["storePath"])
+    links = [line[0:]
+             for line in subprocess.check_output(cmd, shell=True).splitlines()]
+    return links
+
+
+def listStored():
+    cmd = "find -P '{}' -type f -iname \"*\" -not -iname \".*\"".format(
+        cnf.conf['storePath'])
+    paths = [line[0:]
+             for line in subprocess.check_output(cmd, shell=True).splitlines()]
+    return paths
+
+
 def hashFile(filename):
     if not path.isfile(filename):
         return None
@@ -81,10 +127,7 @@ def hashFile(filename):
         return sha256(f.read()).hexdigest()
 
 
-def getFileStat(filename):
-    if not path.isfile(filename):
+def getLinkTo(filename):
+    if not path.islink(filename):
         return None
-
-    fstat = lstat(filename)
-
-    return fst_stat(fstat)
+    return readlink(filename)

@@ -3,9 +3,11 @@
 # -*- coding: utf-8 -*-
 
 u"""
+
 constStore.py
 
 definición de constantes.
+
 """
 
 # codigos de retorno

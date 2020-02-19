@@ -2,28 +2,31 @@
 
 # -*- coding: utf-8 -*-
 
-"""
+u"""
 
 prueba.py
 
 Módulo librería para el acceso a la base de datos de
 fileStore
+
 """
 
 from os import path
+# from stat import *
 from libStore import constStore as cons
 from libStore import configStore as cnf
 from libStore import bdStore
 from libStore import fileST
 
 if __name__ == '__main__':
-    print(cons.MSG_OK + "Script de pruebas de fileStore." + cons.MSG_END)
-    db = bdStore.bdStore()
+    print(cons.MSG_OK + "\nScript de pruebas de fileStore." + cons.MSG_END)
+    print("------------------------------------------------")
+    db = bdStore.BaseDatos
     print("Gestor Base de Datos: %s%s%s" %
           (cons.MSG_OK, db.version[0], cons.MSG_END))
     print("Path al almacén: %s%s%s" %
           (cons.MSG_OK, cnf.conf["storePath"], cons.MSG_END))
-    print("------------------------------------------------")
+    print("------------------------------------------------\n")
 
     # chksum del file id = 1 en bd
     chksum = "0a4a27ae3c098749df9ded52b0a56f8a8484f10055eec69fa891aefe5644a72a"
@@ -45,7 +48,7 @@ if __name__ == '__main__':
     uris = db.getUrisOfFile(fid)
     for u in uris:
         print("")
-        reg = db.getUris(u[0])
+        reg = db.getUri(u[0])
         upath = reg[0][0]
         uname = reg[0][1]
         ufullname = "{}/{}".format(upath, uname)
@@ -56,7 +59,14 @@ if __name__ == '__main__':
                 print("\ty no ha sido modificado")
             else:
                 print("\tpero ha sido modificado")
-            fstat = fileST.getFileStat(ufullname)
+            fstat = fileST.fst_stat(ufullname)
             print("propietario: %s" % fstat.uname)
+            print("rights: {} - {}".format(fstat.rights, oct(fstat.rights)))
+            print("modo: {}\ttipo: {}".format(
+                "%o" % fstat.mode, fstat.type))
         else:
             print("El fichero no existe en el path registrado")
+
+    enlaces = fileST.findStoreLinks(cnf.conf["storedDirs"][2])
+    print(enlaces[0].decode("utf-8"))
+    print(len(enlaces))
