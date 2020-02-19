@@ -37,7 +37,8 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/smcicoss/fileStore",
     packages=setuptools.find_packages(),
-    scripts=["scripts/prueba.py"],
+    scripts=["pruebas/prueba.py",
+             "filestore/checkStore.py"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
