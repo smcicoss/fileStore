@@ -15,22 +15,22 @@ from os import path
 # from stat import *
 from libStore import constStore as cons
 from libStore import configStore as cnf
-from libStore import bdStore
+from libStore.bdStore import BDStore
 from libStore import fileST
 
 if __name__ == '__main__':
     print(cons.MSG_OK + "\nScript de pruebas de fileStore." + cons.MSG_END)
     print("------------------------------------------------")
-    db = bdStore.BaseDatos
+#    db = bdStore.BaseDatos
     print("Gestor Base de Datos: %s%s%s" %
-          (cons.MSG_OK, db.version[0], cons.MSG_END))
+          (cons.MSG_OK, BDStore.version[0], cons.MSG_END))
     print("Path al almacén: %s%s%s" %
           (cons.MSG_OK, cnf.conf["storePath"], cons.MSG_END))
     print("------------------------------------------------\n")
 
     # chksum del file id = 1 en bd
     chksum = "0a4a27ae3c098749df9ded52b0a56f8a8484f10055eec69fa891aefe5644a72a"
-    fid = db.getFileId(chksum)
+    fid = BDStore.getFileId(chksum)
     print("file id: {}".format(fid))
 
     # busca el fichero en el Store
@@ -45,16 +45,16 @@ if __name__ == '__main__':
     else:
         print("\n{} - Fichero en el almacén:\n\t{}".format(len(enlace), enlace))
 
-    uris = db.getUrisOfFile(fid)
+    uris = BDStore.getUrisOfFile(fid)
     for u in uris:
         print("")
-        reg = db.getUri(u[0])
+        reg = BDStore.getUri(u[0])
         upath = reg[0][0]
         uname = reg[0][1]
         ufullname = "{}/{}".format(upath, uname)
         print(ufullname)
         if path.exists(ufullname):
-            print("El fichero existe")
+            print("El fichero existe en {}".format(ufullname))
             if fileST.hashFile(ufullname) == chksum:
                 print("\ty no ha sido modificado")
             else:
@@ -68,5 +68,8 @@ if __name__ == '__main__':
             print("El fichero no existe en el path registrado")
 
     enlaces = fileST.findStoreLinks(cnf.conf["storedDirs"][2])
-    # print(cons.MSG_ALERT, enlaces[0].decode("utf-8"), cons.MSG_END)
-    print(cons.MSG_ALERT, len(enlaces), cons.MSG_END)
+    if enlaces is not None:
+        print(cons.MSG_ALERT, enlaces[0].decode("utf-8"), cons.MSG_END)
+        print(cons.MSG_ALERT, len(enlaces), cons.MSG_END)
+
+    print(BDStore.insertFile("pepe botella"))

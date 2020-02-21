@@ -1,6 +1,7 @@
 #! /usr/bin/python3
 
 # -*- coding: utf-8 -*-
+# ·
 
 u"""
 
@@ -117,9 +118,13 @@ def findStoreLinks(origen):
     # Busca los enlaces simbílicos que apuntan al store dentro de un árbol
     cmd = "find \"{}\" -type l -lname \"{}*\"".format(
         origen, cnf.conf["storePath"])
-    links = [line[0:]
-             for line in subprocess.check_output(cmd, shell=True).splitlines()]
-    return links
+    try:
+        links = [line[0:]
+                 for line in subprocess.check_output(cmd, shell=True).splitlines()]
+    except subprocess.CalledProcessError:
+        links = None
+    else:
+        return links
 
 
 def listStored():

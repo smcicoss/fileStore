@@ -75,8 +75,21 @@ class bdStore(object):
 
     def insertFile(self, fileChk):
         # Inserta un fichero en la BD
-        # TODO
-        pass
+        # Devuelve su id
+        try:
+            with self.__conect.cursor() as cursor:
+                sql = "INSERT INTO files (sha256sum) VALUES ('%s');" % fileChk
+                cursor.execute(sql)
+            self.__conect.commit()
+
+            with self.__conect.cursor() as cursor:
+                self.cursor.execute("SELECT MAX(id) AS id FROM files;")
+            return self.cursor.fetchone()[0]
+
+        except pymysql.err.DataError:
+            return None
+        except pymysql.err.IntegrityError:
+            return None
 
 
 BaseDatos = bdStore()

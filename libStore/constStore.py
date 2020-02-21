@@ -18,6 +18,7 @@ ERROR_NO_EJECUTABLE = 10
 ERROR_NO_SOURCE_DIR = 11
 ERROR_NO_VARIABLES = 12
 ERROR_NO_PERMITIDO = 20
+ERROR_DB = 30
 
 # secuencias de ecape para colorear salida
 MSG_OK = "\033[0;40;32m"

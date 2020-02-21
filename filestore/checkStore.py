@@ -49,9 +49,32 @@ def scanStoreInDB():
             print("{}{} no se encuentra en la base de datos{}".format(
                 cons.MSG_ERROR, namestored, cons.MSG_END))
             # TODO: registrar caso
-            #         buscar solución
-            #         podría ser buscar enlace que apunte al fichero
-            sys.exit(1)
+            # --------------------------------------------------------
+
+            # 1º - Buscar enlace que apunte a
+            linksOrigin = []
+            for origin in cnf.conf["storedDirs"]:
+                linksOrigin.append(fileST.findLinkTo(origin, fstored))
+            if len(linksOrigin) > 0:
+                # si existe
+                # 2º - registrar fichero
+                new_id = BDStore.insertFile(namestored)
+                if new_id is None:
+                    print("%sError al insertar %s\n%sTermino%s" % (
+                        cons.MSG_ERROR, namestored, cons.MSG_ALERT, cons.MSG_END))
+                    sys.exit(cons.ERROR_DB)
+            # TODO:
+            #       3º - obtener metadatos y registrarlos
+            #   si no existe
+            #       2º - buscar origen mismo contenido
+            #       si existe
+            #           3º - registrar fichero
+            #           4º - registrar metadatos
+            #           5º - borrar origen
+            #           6º - crear enlace
+            #       si no existe
+            #           3º - registrar fichero
+            #           4º - registrar huérfano
         else:
             print("\n{} -> {}".format(fstored, fsid))
 
