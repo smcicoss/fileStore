@@ -34,8 +34,11 @@ def presenta():
     print(days[int(time.strftime("%w"))] + time.strftime(" %d/%m/%Y %H:%M:%S"))
     print("------------------------------------------------\n")
 
+# TODO:
+#       obtener listado de origen sobre fichero temporal
 
 ##########################################################################
+
 
 def scanStoreInDB():
     # escaneo el store en busca de ficheros sin registro
@@ -187,5 +190,13 @@ def checkDB():
 
 presenta()
 
-scanStoreInDB()
+# scanStoreInDB()
 # scanLinksOrigins()
+
+print("Escaneando origen en busca de enlaces")
+linksOrigins = fileST.sourceLinks()
+linksOrigins.toBeggining()
+
+print("Total encontrados: {}".format(len(linksOrigins.listSources)))
+for linea in linksOrigins.listSources:
+    print(linea.rstrip())

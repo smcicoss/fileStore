@@ -19,7 +19,32 @@ import pwd
 import grp
 import subprocess
 import magic
+import tempfile
 from libStore import configStore as cnf
+
+# Variable global para almacenar la lista de ficheros de origen
+listFOrigins = None  # ficheros
+listLOrigins = None  # enlaces al Store
+
+
+class sourceLinks():
+    def __init__(self):
+        self.listSources = tempfile.TemporaryFile(mode='w+t')
+
+        for origin in cnf.conf["storedDirs"]:
+            try:
+                # Escribe tres líneas en el archivo temporal
+                self.listSources.writelines(findStoreLinks(origin))
+            finally:
+                pass
+
+            # break
+
+    def __del__(self):
+        self.listSources.close()
+
+    def toBeggining(self):
+        self.listSources.seek(0)
 
 
 class fst_stat():
