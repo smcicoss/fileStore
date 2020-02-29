@@ -1,0 +1,29 @@
+print("%s\n%sComprobando la inclusión de los ficheros de el 'Store' en la 'DB'%s\n%s" % (
+    '-' * 80, cons.MSG_WARNING, cons.MSG_END, '-' * 80))
+print("Obteniendo la lista de ficheros en el 'Store'")
+
+lista = fileST.listStored()
+print("Ficheros encontrados: %s" % len(lista))
+print("Comprobando inclusión en BD")
+n = 0
+print("{0:7} - {1:64} - {2:7}".format("número", "nombre", "id"))
+for fstored in lista:
+    namestored = path.basename(fstored)
+     fsid = BDStore.getFileId(namestored)
+      n += 1
+       if fsid is None:
+            pfsid = ""
+        else:
+            pfsid = fsid
+        print("{0:7} - {1:64} - {2:7}".format(n, namestored, pfsid), end="\r")
+        if fsid is None:
+            print("\n{}{}\n\tno se encuentra en la base de datos{}".format(
+                cons.MSG_ERROR, namestored, cons.MSG_END))
+            # Incluyo en DB
+            new_id = BDStore.insertFile(namestored)
+            if new_id is None:
+                print("%sError al insertar %s\n%sTermino%s" % (
+                    cons.MSG_ERROR, namestored, cons.MSG_ALERT, cons.MSG_END))
+                sys.exit(cons.ERROR_DB)
+            else:
+                print("Insertado con el id: {}".format(new_id))

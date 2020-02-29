@@ -12,8 +12,10 @@ fileStore
 """
 
 import pymysql
+import sys
 
 from libStore import configStore as cnf
+from libStore import constStore as cons
 
 
 class bdStore(object):
@@ -38,40 +40,83 @@ class bdStore(object):
         self.cursor.close()
         self.__conect.close()
 
+    def __get(self, sql):
+        try:
+            with self.__conect.cursor() as cursor:
+                cursor.execute(sql)
+                return cursor.fetchall()
+
+        except pymysql.err.ProgrammingError:
+            print("%sError SQL:\n\t%s%s" % (cons.MSG_ERROR, sql, cons.MSG_END))
+
+        except Exception as err:
+            code, mens = err.args
+            print("{}Error {} en 'getFileId'\n\t{}{}".format(
+                cons.MSG_ERROR, code, mens, cons.MSG_END))
+
+        return None
+
+    def __delete(self, tabla, id):
+        sql = "DELETE FROM {} WHERE id = {};".format(tabla, id)
+
+        try:
+            with self.__conect.cursor() as cursor:
+                cursor.execute(sql)
+            self.__conect.commit()
+
+        except Exception as error:
+            print(error)
+            return False
+
+        else:
+            return True
+
     def getFileId(self, chksum):
         # Obtiene el id del fichero en la BD
-        sql = "SELECT id FROM files WHERE sha256sum LIKE '{}'".format(chksum)
-        self.cursor.execute(sql)
-        id = self.cursor.fetchone()
-        if id is None:
-            return None
-        else:
-            return id[0]
+        sql = "SELECT id FROM files WHERE sha256sum LIKE '{}';".format(chksum)
+        result = self.__get(sql)
+        if result is not None:
+            if len(result) > 0:
+                return result[0][0]
+        return None
 
     def getFileChk(self, id):
         # Obtiene el nombre del fichero en la BD
         sql = "SELECT sha256sum FROM files WHERE id = {}".format(id)
-        self.cursor.execute(sql)
-        chk = self.cursor.fetchone()
-        return chk[0]
+        result = self.__get(sql)
+        if result is not None:
+            if len(result) > 0:
+                return result[0][0]
+        return None
 
     def getListFiles(self):
         # obtiene la lista ordenada y completa de los ids de ficheros
-        sql = "SELECT * FROM files ORDER BY id;"
-        self.cursor.execute(sql)
-        return self.cursor.fetchall()
+        sql = "SELECT * FROM files ORDER BY id DESC;"
+        result = self.__get(sql)
+        if result is not None:
+            if len(result) > 0:
+                return result
+            else:
+                return []
+        return None
 
     def getUrisOfFile(self, fileid):
         # Obtiene la lista de todos los orígenes del fichero
-        sql = "SELECT id FROM uris WHERE file_id = {}".format(fileid)
-        self.cursor.execute(sql)
-        return self.cursor.fetchall()
+        sql = "SELECT id FROM uris WHERE file_id = {};".format(fileid)
+        result = self.__get(sql)
+        if result is not None:
+            if len(result) > 0:
+                return result
+        return None
 
     def getUri(self, uriId):
         # Obtiene el path y el nombre de un origen
         sql = "SELECT path, filename FROM uris WHERE id = {}".format(uriId)
-        self.cursor.execute(sql)
-        return self.cursor.fetchall()
+        result = self.__get(sql)
+        if result is not None:
+            if len(result) > 0:
+                return result
+        return None
 
     def insertFile(self, fileChk):
         # Inserta un fichero en la BD
@@ -83,13 +128,30 @@ class bdStore(object):
             self.__conect.commit()
 
             with self.__conect.cursor() as cursor:
-                self.cursor.execute("SELECT MAX(id) AS id FROM files;")
-            return self.cursor.fetchone()[0]
+                cursor.execute("SELECT MAX(id) AS id FROM files;")
+            return cursor.fetchone()[0]
 
-        except pymysql.err.DataError:
-            return None
-        except pymysql.err.IntegrityError:
-            return None
+        except pymysql.err.ProgrammingError:
+            print("%sError SQL:\n\t%s%s" % (cons.MSG_ERROR, sql, cons.MSG_END))
+            sys.exit(cons.ERROR_SQL)
+
+        except Exception as err:
+            code, mens = err.args
+            print("{}Error {} en 'insertFile'\n\t{}{}".format(
+                cons.MSG_ERROR, code, mens, cons.MSG_END))
+
+        return None
+
+    def delFile(self, fileid):
+        return self.__delete('files', fileid)
+
+    def getOrigen(self, storename):
+        sql = "SELECT * FROM origenes WHERE storename = '{}';".format(
+            storename)
+        return self.__get(sql)
+
+    def delUri(self, uriid):
+        return self.__delete('uris', uriid)
 
 
 BaseDatos = bdStore()

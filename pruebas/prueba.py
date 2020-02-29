@@ -33,8 +33,16 @@ if __name__ == '__main__':
     fid = BDStore.getFileId(chksum)
     print("file id: {}".format(fid))
 
+    # utilizamos la función getFileChk()
+    chksum = BDStore.getFileChk(fid)
+
     # busca el fichero en el Store
-    dest = fileST.findStored(chksum)[0].decode('utf-8')
+    result = fileST.findStored(chksum)
+    dest = None
+    if result is not None:
+        if len(result) > 0:
+            dest = result[0]
+
     print("El fichero en el almacen es:\n\t{}".format(dest))
 
     enlace = fileST.findLinkTo("/home/simo/Datos/MyBook/almacen", dest)
@@ -54,7 +62,7 @@ if __name__ == '__main__':
         ufullname = "{}/{}".format(upath, uname)
         print(ufullname)
         if path.exists(ufullname):
-            print("El fichero existe en {}".format(ufullname))
+            print("El fichero existe en\n\t{}".format(ufullname))
             if fileST.hashFile(ufullname) == chksum:
                 print("\ty no ha sido modificado")
             else:
@@ -67,9 +75,23 @@ if __name__ == '__main__':
         else:
             print("El fichero no existe en el path registrado")
 
-    enlaces = fileST.findStoreLinks(cnf.conf["storedDirs"][2])
-    if enlaces is not None:
-        print(cons.MSG_ALERT, enlaces[0].decode("utf-8"), cons.MSG_END)
-        print(cons.MSG_ALERT, len(enlaces), cons.MSG_END)
+    # enlaces = fileST.findStoreLinks(cnf.conf["storedDirs"][10])
+    print("\nObteniendo la lista de enlaces en origen")
+    enlaces = fileST.sourceLinks()
+    if enlaces.listSources is not None:
+        if enlaces.getLen() > 0:
+            print(cons.MSG_ALERT, enlaces.getFirst(), cons.MSG_END)
+            print(cons.MSG_ALERT, enlaces.listSources, cons.MSG_END)
 
-    print(BDStore.insertFile("pepe botella"))
+    # enlaces = fileST.findStoreLinks(cnf.conf["storedDirs"][10])
+    print("\nObteniendo la lista de ficheros en origen")
+    ficheros = fileST.sourceFiles()
+    if ficheros.listSources is not None:
+        lenFicheros = ficheros.getLen()
+        if lenFicheros > 0:
+            print("%sEncontrados %s ficheros en origen%s" %
+                  (cons.MSG_ALERT, lenFicheros, cons.MSG_END))
+            print("%sPrimer Fichero: %s%s" %
+                  (cons.MSG_ALERT, ficheros.getFirst(), cons.MSG_END))
+            print("%sSiguiente Fichero: %s%s" %
+                  (cons.MSG_ALERT, ficheros.getNext(), cons.MSG_END))
